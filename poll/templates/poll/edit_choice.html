@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block font_css %} {% endblock font_css %}
+{% block title %} edit choice {% endblock title %}
+{% block content %}
+<div class="container">
+    <h1>You're trying to edit: {{choice.choice_text}}</h1>
+    <form class="" action="" method="post">
+    {{form.non_field_errors}}
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+        {{field.errors}}
+        {{field.label_tag}}
+        {{field}}
+        
+    </div>
+    {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Edit choice">
+    </form>
+</div>
+
+
+{% endblock content %}

@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+{% block css %}
+
+{% endblock css %}
+{% block content %}
+<div class="container">
+<h1 class="text-center">Current Poll: {{poll.text}} </h1>
+<p class="text-center">Add choice to current poll with the form below </p>
+<form class="" action="" method="post">
+    {{form.non_field_errors}}
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+        {{field.errors}}
+        {{field.label_tag}}
+        {{field}}
+        
+    </div>
+    {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Add choice"> 
+
+</form>
+</div>
+{% endblock content %}
+

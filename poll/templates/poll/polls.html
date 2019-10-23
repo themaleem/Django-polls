@@ -1,0 +1,60 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Polls Lists {% endblock%}
+{% block font_css %} 
+   <script src="https://kit.fontawesome.com/e6b819aa57.js" crossorigin="anonymous"></script>
+{% endblock %}
+{% block content %} 
+<div class="container">
+    <a href="?title=True" class="btn btn-{% if 'title' in request.GET %}warning{% else %}primary{% endif %}">A-Z </i></a>
+
+    <a href="?latest=True" class="btn btn-{% if 'latest' in request.GET %}warning{% else %}primary{% endif %}">Latest</a>
+    
+    <a href="?mine=True" class="btn btn-{% if 'mine' in request.GET %}warning{% else %}primary{% endif %}">My polls</a>
+    
+    <a href="{% url "poll:add" %}" class="btn btn-primary">Add Poll <i class="fas fa-plus"></i></a>
+    <br> <br>
+    
+    <form class="form-inline my-2 my-lg-2">
+      <input class="form-control mr-sm-2" name="search" type="search" value="{{search}}" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+
+        {% if messages %}
+                {% for message in messages %} 
+                    <div {% if message.tags %} class="{{message.tags}}" {% endif %}>
+                        {{message}}
+                    </div>
+                {% endfor %}
+        {% endif %}
+    <ul class="list-group">
+        {% for poll in polls %}
+        <li class='list-group-item'>
+            <a href="{% url 'poll:details' poll.id %}">{{poll}}</a>
+            {% if request.user == poll.owner %}         
+                <a class="float-right" href="{% url 'poll:edit_poll' poll.id %}"><i class="fas fa-pencil-alt">edit</i> </a>
+            {% endif %}
+        </li>
+        {% endfor %}
+    </ul>
+    <div class="">
+        <span class="">
+            {% if polls.has_previous %}
+                <a href="?page=1&{{params}}">&laquo; first</a>
+                <a href="?page={{ polls.previous_page_number }}&{{params}}">previous</a>
+            {% endif %}
+
+            <span class="current">
+                Page {{ polls.number }} of {{ polls.paginator.num_pages }}.
+            </span>
+
+            {% if polls.has_next %}
+                <a href="?page={{ polls.next_page_number }}&{{params}}">next</a>
+                <a href="?page={{ polls.paginator.num_pages }}&{{params}}">last &raquo;</a>
+            {% endif %}
+        </span>
+    </div>
+</div>
+{% endblock %}
+
+

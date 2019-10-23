@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+{% block title %} {% endblock %}
+{% block content %}
+<div class="container">
+    {% comment  %} <a href="{% url 'poll:delete' %}">Delete poll</a>{% endcomment %}
+    {% if messages %}
+        <ul class="messages">
+            {% for message in messages %} 
+                <li {% if message.tags %} class="{{message.tags}}" {% endif %}>
+                    {{message}}
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <form action="{% url 'poll:vote' poll.id %}" method="post">
+        {% csrf_token %}
+        {% for choice in poll.choice_set.all %}
+        <input type="radio" name="choice" id="choice{{forloop.counter}}" value="{{choice.id}}">
+        <label for="choice{{forloop.counter}}">{{choice.choice_text}}</label>
+        <br>
+        {% endfor %}
+        <input class="btn btn-primary" type="submit" value="Submit" {% if not user_can_vote %} disabled {% endif %} >    
+    </form>
+</div>
+
+{% endblock %}

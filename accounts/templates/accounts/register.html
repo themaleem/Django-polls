@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block title %} Register view {% endblock title %}
+
+{% block content %}
+<div class="container">
+    <form action="" method="POST">
+        {{form.non_field_errors}}
+        {% csrf_token %}
+        {% for field in form %}
+        <div class="form-group">
+            {{field.errors}}
+            {{field.label_tag}}
+            {{field}}
+            
+        </div>
+        {% endfor %}
+        <input class="btn btn-primary" type="submit" value="Register">
+
+    </form>
+    <p>Already have an account? <a href="{% url "accounts:login" %}">Login</a></p>
+</div>
+
+{% endblock content %}

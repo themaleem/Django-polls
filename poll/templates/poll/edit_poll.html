@@ -1,0 +1,44 @@
+{% extends 'base.html' %}
+{% block font_css %} {% endblock font_css %}
+{% block title %} edit poll {% endblock title %}
+{% block content %}
+<div class="container">
+    <h1>You're trying to edit: {{poll}}</h1>
+    <form class="" action="" method="post">
+    {{form.non_field_errors}}
+    {% csrf_token %}
+    {% for field in form %}
+    <div class="form-group">
+        {{field.errors}}
+        {{field.label_tag}}
+        {{field}}
+        
+    </div>
+    {% endfor %}
+    <input class="btn btn-primary" type="submit" value="Submit">
+    <a href="{% url 'poll:add_choice' poll.id %}" class="btn btn-warning"> Add choices </a>
+    <a href="{% url 'poll:delete_poll' poll.id %}" class="btn btn-danger"> Delete Poll</a>
+    </form><br><br>
+    <div class="col-md-6 offset-md-3">
+        {% if messages %}
+        <ul class="messages">
+            {% for message in messages %} 
+                <li {% if message.tags %} class="{{message.tags}}" {% endif %}>
+                    {{message}}
+
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+        {% for choice in poll.choice_set.all %}
+            <p>
+                <a href="{% url 'poll:edit_choice' choice.id %}">Edit</a>
+                {{choice.choice_text}}
+                <a href="{% url 'poll:delete_choice' choice.id %}">Delete</a> 
+            </p>
+        {% endfor %}
+    </div>
+</div>
+
+
+{% endblock content %}

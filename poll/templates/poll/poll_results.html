@@ -1,0 +1,10 @@
+{% extends 'base.html' %}
+{% block title %} {% endblock %}
+{% block content %}
+    <h4>Thank you. You have just voted on "{{poll.text}}" which has "{{poll.num_votes}}" votes. You chose "{{choice.choice_text}}".</h4>
+    <ul>
+        {% for choice in poll.choice_set.all %}
+        <li>{{choice.choice_text}} - {{choice.num_votes}}</li>
+        {% endfor %}
+    </ul>
+{% endblock %}
