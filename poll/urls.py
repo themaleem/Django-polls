@@ -14,7 +14,9 @@ urlpatterns = [
     path('details/<int:poll_id>/vote/',views.poll_vote,name="vote"),
     
     # API VIEWS starts
-    path('api/user/',views.user_list,name="api"),
-    path('api/poll-list',views.PollList2.as_view(),name="api-polllist"),
-    path('api/poll-detail/<int:pk>',views.PollDetail2.as_view(),name="api-polldetail"),
+    path('api/user/',views.user_list,name="user_list"),
+    path('api/polls',views.PollList2.as_view(),name="polls_list"),
+    path('api/poll/<int:pk>',views.PollDetail2.as_view(),name="poll_detail"),
+    path('api/poll/<int:poll_pk>/choices/',views.ChoiceList.as_view(),name="choice_list"),
+    path('api/poll/<int:poll_pk>/choices/<int:choice_pk>/vote',views.CreateVote.as_view(),name="create_vote"),
 ]

@@ -21,20 +21,20 @@ class UserSerializer(serializers.Serializer):
         return instance
 
 class VoteSerializer(serializers.ModelSerializer):
-    user=UserSerializer(many=True,required=False)
+    # user=UserSerializer(many=True,required=False)
     class Meta:
         model= Vote
         fields="__all__"
     
 class ChoiceSerializer(serializers.ModelSerializer):
-    vote=VoteSerializer(many=True,required=False)
+    votes = VoteSerializer(many=True, required=False)
     class Meta:
         model= Choice
         fields="__all__"
 
 class PollSerializer(serializers.ModelSerializer):
+    choices = ChoiceSerializer(many=True, read_only=True, required=False)
     
     class Meta:
         model= Poll
         fields="__all__"
-
