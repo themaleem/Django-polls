@@ -2,23 +2,22 @@ from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Vote,Poll,Choice
 
-
-class UserSerializer(serializers.Serializer):
-    username=serializers.CharField(max_length=100)
-    first_name=serializers.CharField(max_length=100)
-    last_name=serializers.CharField(max_length=100)
-    email=serializers.EmailField(max_length=100)
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=User
+        fields=('username','email','password')
+        extra_kwargs={'password':{'write_only':True}}
 
     def create(self,validated_data):
         return User.objects.create(**validated_data)
     
-    def update(self, instance, validated_data):
-        instance.username = validated_data.get('username', instance.username)
-        instance.first_name = validated_data.get('first_name', instance.first_name)
-        instance.last_name = validated_data.get('last_name', instance.last_name)
-        instance.email = validated_data.get('email', instance.email)
-        instance.save()
-        return instance
+    # def update(self, instance, validated_data):
+    #     instance.username = validated_data.get('username', instance.username)
+    #     instance.first_name = validated_data.get('first_name', instance.first_name)
+    #     instance.last_name = validated_data.get('last_name', instance.last_name)
+    #     instance.email = validated_data.get('email', instance.email)
+    #     instance.save()
+    #     return instance
 
 class VoteSerializer(serializers.ModelSerializer):
     # user=UserSerializer(many=True,required=False)

@@ -41,6 +41,7 @@ INSTALLED_APPS = [
     'poll',
     'accounts',
     'rest_framework',
+    'rest_framework.authtoken',
     
 ]
 

@@ -1,6 +1,6 @@
 from django.http import HttpResponse,HttpResponseRedirect
 from django.shortcuts import render,get_object_or_404,redirect
-from poll.models import Poll,Choice,Vote
+from poll.models import Poll,Choice,Vote,User
 from django.urls import reverse
 from django.contrib import messages
 from django.contrib.auth.decorators import login_required
@@ -15,39 +15,40 @@ from rest_framework.parsers import JSONParser
 from rest_framework.renderers import JSONRenderer
 from rest_framework import status
 from rest_framework.views import APIView
-from django.contrib.auth.models import User
 from rest_framework import generics
+from rest_framework.response import Response
+from rest_framework import viewsets
 # Create your views here.
 
 
 # API funcs starts
-class JSONResponse(HttpResponse):
-    def __init__(self, data, **kwargs):
-        content = JSONRenderer().render(data)
-        kwargs['content_type'] = 'application/json'
-        super(JSONResponse, self).__init__(content, **kwargs)
-
-@csrf_exempt
-def user_list(request):
-    if request.method == 'GET':
-        users = User.objects.all()
-        users_serializer = UserSerializer(users, many=True)
-        return JSONResponse(users_serializer.data)
-    
-    elif request.method == 'POST':
-        user_data = JSONParser().parse(request)
-        user_serializer = UserSerializer(data=user_data)
-        if user_serializer.is_valid():
-            user_serializer.save()
-            return JSONResponse(user_serializer.data, status=status.HTTP_201_CREATED)
-        return JSONResponse(user_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
-
-
-# Versions of API in acsending format
-# comment out all  but one at an instance 
-# edit urls.py to match the uncommented view 
+# Versions of API in acsending order
+# comment out all but one at an instance 
+# and edit urls.py to match the uncommented view 
 
 # Version 1
+
+# class JSONResponse(HttpResponse):
+#     def __init__(self, data, **kwargs):
+#         content = JSONRenderer().render(data)
+#         kwargs['content_type'] = 'application/json'
+#         super(JSONResponse, self).__init__(content, **kwargs)
+
+# @csrf_exempt
+# def user_list(request):
+#     if request.method == 'GET':
+#         users = User.objects.all()
+#         users_serializer = UserSerializer(users, many=True)
+#         return JSONResponse(users_serializer.data)
+    
+#     elif request.method == 'POST':
+#         user_data = JSONParser().parse(request)
+#         user_serializer = UserSerializer(data=user_data)
+#         if user_serializer.is_valid():
+#             user_serializer.save()
+#             return JSONResponse(user_serializer.data, status=status.HTTP_201_CREATED)
+#         return JSONResponse(user_serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
 
 # class PollList(APIView):
 #     def get(self,request):
@@ -62,6 +63,9 @@ def user_list(request):
 #         return JSONResponse(data)
 
 # version 2
+class Users(generics.ListCreateAPIView):
+    queryset=User.objects.all()
+    serializer_class=UserSerializer
 
 class PollList2(generics.ListCreateAPIView):
     queryset=Poll.objects.all()
@@ -72,16 +76,31 @@ class PollDetail2(generics.RetrieveDestroyAPIView):
     serializer_class=PollSerializer
 
 class ChoiceList(generics.ListCreateAPIView):
+    def get_queryset(self):
+        queryset=Choice.objects.filter(poll_id=self.kwargs['poll_pk'])
+        return queryset
+    serializer_class=ChoiceSerializer
+
+class ChoiceDetail(generics.RetrieveDestroyAPIView):
     queryset=Choice.objects.all()
     serializer_class=ChoiceSerializer
 
-# class ChoiceDetail(generics.RetrieveDestroyAPIView):
-#     queryset=Choice.objects.all()
-#     serializer_class=ChoiceSerializer
-
 class CreateVote(generics.CreateAPIView):
-    queryset=Vote.objects.all()
     serializer_class=VoteSerializer
+    def post(self,request,poll_pk,choice_pk):
+        voted_by=request.data.get('user')
+        data={'poll':poll_pk,'choice':choice_pk,'user':voted_by}
+        serializer=VoteSerializer(data=data)
+        if serializer.is_valid():
+            vote=serializer.save()
+            return Response(serializer.data,status=status.HTTP_201_CREATED)
+        else:
+            return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
+
+
+class PollViewSet(viewsets.ModelViewSet):
+    queryset=Poll.objects.all()
+    serializer_class=PollSerializer
 
 # API func ends
 
