@@ -9,10 +9,11 @@ from django.core.paginator import Paginator,EmptyPage,PageNotAnInteger
 
 # API views
 from .serializers import UserSerializer,VoteSerializer,PollSerializer,ChoiceSerializer
-from django.http import HttpResponse
-from django.views.decorators.csrf import csrf_exempt  #allows csrf from any origin
-from rest_framework.parsers import JSONParser
-from rest_framework.renderers import JSONRenderer
+# from django.http import HttpResponse
+# from django.views.decorators.csrf import csrf_exempt  #allows csrf from any origin
+# from rest_framework.parsers import JSONParser
+# from rest_framework.renderers import JSONRenderer
+from django.contrib.auth import authenticate
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework import generics
@@ -24,7 +25,8 @@ from rest_framework import viewsets
 # API funcs starts
 # Versions of API in acsending order
 # comment out all but one at an instance 
-# and edit urls.py to match the uncommented view 
+# edit urls.py to match the uncommented view 
+# and import neccessary modules
 
 # Version 1
 
@@ -64,6 +66,8 @@ from rest_framework import viewsets
 
 # version 2
 class Users(generics.ListCreateAPIView):
+    # authentication_classes=()
+    # permission_classes=()
     queryset=User.objects.all()
     serializer_class=UserSerializer
 
@@ -97,10 +101,20 @@ class CreateVote(generics.CreateAPIView):
         else:
             return Response(serializer.errors,status=status.HTTP_400_BAD_REQUEST)
 
-
 class PollViewSet(viewsets.ModelViewSet):
     queryset=Poll.objects.all()
     serializer_class=PollSerializer
+
+class LoginView(APIView):
+    permission_classes = ()
+    def post(self, request,):
+        username = request.data.get("username")
+        password = request.data.get("password")
+        user = authenticate(username=username, password=password)
+        if user:
+            return Response({"token": user.auth_token.key})
+        else:
+            return Response({"error": "Wrong Credentials"}, status=status.HTTP_400_BAD_REQUEST)
 
 # API func ends
 

@@ -4,7 +4,7 @@ from rest_framework.routers import DefaultRouter
 app_name="poll"
 
 router=DefaultRouter()
-router.register('polls',views.PollViewSet,base_name='polls')
+router.register('p',views.PollViewSet,base_name='polls')
 
 urlpatterns = [
     path('',views.polls,name="polls"),
@@ -26,6 +26,7 @@ urlpatterns = [
     # API VIEWS starts
     path('api/',include([
         path('users',views.Users.as_view(),name="users"),
+        path('login',views.LoginView.as_view(),name="api_login"),
         path('polls/', include([
             path('',views.PollList2.as_view(),name="polls_list"),
             path('<int:pk>',views.PollDetail2.as_view(),name="poll_detail"),
@@ -33,4 +34,9 @@ urlpatterns = [
             path('<int:poll_pk>/choices/<int:choice_pk>/vote',views.CreateVote.as_view(),name="create_vote"),
         ]))
     ]))
-] 
+]
+
+# adds url paths for polls list,create and details views
+# first arg on register func tacks on to the app's default url i.e  127.0.0.1:8000/<app_name>/<first_arg>/
+# and use base_name for path name ie poll-list,poll-details
+urlpatterns+= router.urls 

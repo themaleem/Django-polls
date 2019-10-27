@@ -1,6 +1,8 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
 from .models import Vote,Poll,Choice
+from rest_framework.authtoken.models import Token
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,7 +11,9 @@ class UserSerializer(serializers.ModelSerializer):
         extra_kwargs={'password':{'write_only':True}}
 
     def create(self,validated_data):
-        return User.objects.create(**validated_data)
+        user=User.objects.create(**validated_data)
+        Token.objects.create(user=user)
+        return user
     
     # def update(self, instance, validated_data):
     #     instance.username = validated_data.get('username', instance.username)
