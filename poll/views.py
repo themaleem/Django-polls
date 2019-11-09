@@ -19,6 +19,7 @@ from rest_framework.views import APIView
 from rest_framework import generics
 from rest_framework.response import Response
 from rest_framework import viewsets
+from rest_framework.exceptions import PermissionDenied
 # Create your views here.
 
 
@@ -66,24 +67,35 @@ from rest_framework import viewsets
 
 # version 2
 class Users(generics.ListCreateAPIView):
-    # authentication_classes=()
-    # permission_classes=()
+    authentication_classes=()
+    permission_classes=()
     queryset=User.objects.all()
     serializer_class=UserSerializer
 
-class PollList2(generics.ListCreateAPIView):
-    queryset=Poll.objects.all()
-    serializer_class=PollSerializer
+# PollList2 and PollDetail2 has been replaced with PollViewSet class
 
-class PollDetail2(generics.RetrieveDestroyAPIView):
-    queryset=Poll.objects.all()
-    serializer_class=PollSerializer
+# class PollList2(generics.ListCreateAPIView):
+#     queryset=Poll.objects.all()
+#     serializer_class=PollSerializer
+
+# class PollDetail2(generics.RetrieveDestroyAPIView):
+#     queryset=Poll.objects.all()
+#     serializer_class=PollSerializer
 
 class ChoiceList(generics.ListCreateAPIView):
     def get_queryset(self):
         queryset=Choice.objects.filter(poll_id=self.kwargs['poll_pk'])
         return queryset
     serializer_class=ChoiceSerializer
+
+    # prevents authenticated user from posting choice to polls they didn't create
+    def post(self,request,*args, **kwargs):
+        poll=Poll.objects.get(pk=self.kwargs['poll_pk'])
+        if not request.user == poll.owner:
+            raise PermissionDenied("You can not create choice for this poll.")
+        return super().post(request,* args, ** kwargs)
+
+
 
 class ChoiceDetail(generics.RetrieveDestroyAPIView):
     queryset=Choice.objects.all()
@@ -104,6 +116,13 @@ class CreateVote(generics.CreateAPIView):
 class PollViewSet(viewsets.ModelViewSet):
     queryset=Poll.objects.all()
     serializer_class=PollSerializer
+
+    # prevents authenticated user from deleting polls he didn't create
+    def destroy(self, request,* args, ** kwargs):
+        poll = Poll.objects.get(pk=self.kwargs["pk"])
+        if not request.user == poll.owner:
+            raise PermissionDenied("You can not delete this polls you didn't create.")
+        return super().destroy(request,* args, ** kwargs)
 
 class LoginView(APIView):
     permission_classes = ()
