@@ -5,7 +5,7 @@ from rest_framework.routers import DefaultRouter
 app_name="poll"
 
 router=DefaultRouter()
-router.register('api/polls',views.PollViewSet,base_name='polls')
+router.register('api/polls',views.PollViewSet,)
 
 urlpatterns = [
     path('',views.polls,name="polls"),
