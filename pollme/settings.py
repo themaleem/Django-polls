@@ -26,7 +26,7 @@ SECRET_KEY = '8gn)53tb$bkb3*59d$1+@5t0_p5w1&qh%itklnlodjk9(x!ruj'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['dj-pollme.herokuapp.com','127.0.0.1']
 
 
 # Application definition
@@ -131,8 +131,10 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, "static")
-    ]
+    os.path.join(BASE_DIR,'static')
+]
+STATIC_ROOT = os.path.join(BASE_DIR,"staticfiles")
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 REST_FRAMEWORK={
     'DEFAULT_AUTHENTICATION_CLASSES':(
@@ -144,3 +146,10 @@ REST_FRAMEWORK={
     ),
     'DEFAULT_SCHEMA_CLASS': 'rest_framework.schemas.coreapi.AutoSchema'
 }
+
+# To reconfigure the production database
+import dj_database_url
+
+prod_db  =  dj_database_url.config(conn_max_age=500)
+
+DATABASES['default'].update(prod_db)
